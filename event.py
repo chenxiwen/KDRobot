@@ -48,6 +48,12 @@ class MessageReceiveEvent(Event):
     def event_type():
         return "im.message.receive_v1"
 
+class MessageReadEvent(Event):
+    # message receive event defined in https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/im-v1/message/events/message_read
+
+    @staticmethod
+    def event_type():
+        return "im.message.message_read_v1"
 
 class UrlVerificationEvent(Event):
 
@@ -63,7 +69,7 @@ class UrlVerificationEvent(Event):
 class EventManager(object):
     event_callback_map = dict()
     event_type_map = dict()
-    _event_list = [MessageReceiveEvent, UrlVerificationEvent]
+    _event_list = [MessageReceiveEvent, UrlVerificationEvent, MessageReadEvent]
 
     def __init__(self):
         for event in EventManager._event_list:
@@ -84,6 +90,7 @@ class EventManager(object):
     def get_handler_with_event(token, encrypt_key):
         dict_data = json.loads(request.data)
         dict_data = EventManager._decrypt_data(encrypt_key, dict_data)
+        # print(dict_data)
         callback_type = dict_data.get("type")
         # only verification data has callback_type, else is event
         if callback_type == "url_verification":
@@ -97,8 +104,10 @@ class EventManager(object):
 
         # get event_type
         event_type = dict_data.get("header").get("event_type")
+        # print(">>>>>>>>>>", event_type)
         # build event
         event = EventManager.event_type_map.get(event_type)(dict_data, token, encrypt_key)
+        # print("############", event)
         # get handler
         return EventManager.event_callback_map.get(event_type), event
 

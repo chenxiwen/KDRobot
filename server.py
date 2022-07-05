@@ -4,7 +4,7 @@ import os
 import logging
 import requests
 from api import MessageApiClient
-from event import MessageReceiveEvent, UrlVerificationEvent, EventManager
+from event import MessageReceiveEvent, UrlVerificationEvent, EventManager, MessageReadEvent
 from flask import Flask, jsonify
 from dotenv import load_dotenv, find_dotenv
 
@@ -43,9 +43,21 @@ def message_receive_event_handler(req_data: MessageReceiveEvent):
         # get open_id and text_content
     open_id = sender_id.open_id
     text_content = message.content
+    print("MessageReceiveEvent:\n\topen_id="+open_id+"\n\tmessage_id="+message.message_id+"\n\tmessage_type="+message.message_type+"\n\tmessage_content="+text_content)
     # echo text message
     message_api_client.send_text_with_open_id(open_id, text_content)
     return jsonify()
+
+
+@event_manager.register("im.message.message_read_v1")
+def message_read_event_handler(req_data: MessageReadEvent):
+    message_id_list = req_data.event.message_id_list
+    read_time = req_data.event.reader.read_time
+    reader_id = req_data.event.reader.reader_id
+    open_id = reader_id.open_id
+    print("MessageReadEvent:\n\topen_id="+open_id+"\n\tmessage_id_list="+str(message_id_list)+"\n\tread_time="+read_time)
+    return jsonify()
+
 
 
 @app.errorhandler
@@ -68,4 +80,4 @@ def callback_event_handler():
 
 if __name__ == "__main__":
     # init()
-    app.run(host="0.0.0.0", port=3000, debug=True)
+    app.run(host="0.0.0.0", port=44444, debug=True)
