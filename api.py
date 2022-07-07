@@ -25,6 +25,9 @@ class MessageApiClient(object):
     def send_text_with_open_id(self, open_id, content):
         self.send("open_id", open_id, "text", content)
 
+    def send_text_with_chat_id(self, chat_id, content):
+        self.send("chat_id", chat_id, "text", content)
+
     def send(self, receive_id_type, receive_id, msg_type, content):
         # send message to user, implemented based on Feishu open api capability. doc link: https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/im-v1/message/create
         self._authorize_tenant_access_token()
@@ -41,6 +44,7 @@ class MessageApiClient(object):
             "content": content,
             "msg_type": msg_type,
         }
+        # print(url, headers, req_body)
         resp = requests.post(url=url, headers=headers, json=req_body)
         MessageApiClient._check_error_response(resp)
 
@@ -51,6 +55,18 @@ class MessageApiClient(object):
         response = requests.post(url, req_body)
         MessageApiClient._check_error_response(response)
         self._tenant_access_token = response.json().get("tenant_access_token")
+
+    def get_group_chat_list(self):
+        self._authorize_tenant_access_token()
+        url = "https://open.feishu.cn/open-apis/im/v1/chats"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + self.tenant_access_token,
+        }
+        resp = requests.get(url=url, headers=headers)
+        MessageApiClient._check_error_response(resp)
+        print(resp.json())
+        return resp.json()
 
     @staticmethod
     def _check_error_response(resp):

@@ -77,6 +77,23 @@ def callback_event_handler():
 
     return event_handler(event)
 
+@app.route("/sendMsg/<open_id>/<msg>", methods=["POST", "GET"])
+def sendMsg2Openid(open_id, msg):
+    print(open_id, msg)
+    message_api_client.send_text_with_open_id(open_id, '{"text":"'+msg+'"}')
+    return jsonify()
+
+@app.route("/sendGroupMsg/<chat_id>/<msg>", methods=["POST", "GET"])
+def sendMsg2Chatid(chat_id, msg):
+    print(chat_id, msg)
+    message_api_client.send_text_with_chat_id(chat_id, '{"text":"'+msg+'"}')
+    return jsonify()
+
+@app.route("/getGroupChatList", methods=["GET"])
+def getGroupChatList():
+    resp = message_api_client.get_group_chat_list()
+    return resp
+
 
 if __name__ == "__main__":
     # init()
