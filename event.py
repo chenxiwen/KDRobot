@@ -43,20 +43,17 @@ class Event(object):
 
 class MessageReceiveEvent(Event):
     # message receive event defined in https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/im-v1/message/events/receive
-
     @staticmethod
     def event_type():
         return "im.message.receive_v1"
 
 class MessageReadEvent(Event):
-    # message receive event defined in https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/im-v1/message/events/message_read
-
+    # message read event defined in https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/im-v1/message/events/message_read
     @staticmethod
     def event_type():
         return "im.message.message_read_v1"
 
 class UrlVerificationEvent(Event):
-
     # special event: url verification event
     def __init__(self, dict_data):
         self.event = dict_2_obj(dict_data)
@@ -65,11 +62,23 @@ class UrlVerificationEvent(Event):
     def event_type():
         return "url_verification"
 
+class RobotAddedEvent(Event):
+    # robot added event defined in https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/im-v1/chat-member-bot/events/added
+    @staticmethod
+    def event_type():
+        return "im.chat.member.bot.added_v1"
+
+class RobotDeletedEvent(Event):
+    # robot deleted event defined in https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/im-v1/chat-member-bot/events/deleted
+    @staticmethod
+    def event_type():
+        return "im.chat.member.bot.deleted_v1"
+
 
 class EventManager(object):
     event_callback_map = dict()
     event_type_map = dict()
-    _event_list = [MessageReceiveEvent, UrlVerificationEvent, MessageReadEvent]
+    _event_list = [MessageReceiveEvent, UrlVerificationEvent, MessageReadEvent, RobotAddedEvent, RobotDeletedEvent]
 
     def __init__(self):
         for event in EventManager._event_list:
@@ -90,7 +99,7 @@ class EventManager(object):
     def get_handler_with_event(token, encrypt_key):
         dict_data = json.loads(request.data)
         dict_data = EventManager._decrypt_data(encrypt_key, dict_data)
-        # print(dict_data)
+        print(dict_data)
         callback_type = dict_data.get("type")
         # only verification data has callback_type, else is event
         if callback_type == "url_verification":
