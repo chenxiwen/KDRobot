@@ -42,12 +42,16 @@ def request_url_verify_handler(req_data: UrlVerificationEvent):
 
 @event_manager.register("im.message.receive_v1")
 def message_receive_event_handler(req_data: MessageReceiveEvent):
+    # print(req_data)
     sender_id = req_data.event.sender.sender_id
     message = req_data.event.message
     if message.message_type != "text":
         logging.warn("Other types of messages have not been processed yet")
         return jsonify()
-        # get open_id and text_content
+    if message.chat_type != "p2p":
+        logging.warn("only support p2p messages have been processed yet")
+        return jsonify()
+    # get open_id and text_content
     message_time = TimeUtil.format_time_milsecond(message.create_time)
     open_id = sender_id.open_id
     text_content = message.content

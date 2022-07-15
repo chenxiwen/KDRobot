@@ -1,0 +1,1 @@
+nohup python3 server.py > robot.log 2>&1 &
