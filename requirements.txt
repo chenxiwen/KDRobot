@@ -2,3 +2,4 @@ Flask==2.0.2
 python-dotenv
 requests
 pycryptodome
+flask_apscheduler

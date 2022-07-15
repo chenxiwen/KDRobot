@@ -1,4 +1,5 @@
 #! /usr/bin/env python3.8
+import json
 import os
 import logging
 import requests
@@ -35,18 +36,18 @@ class MessageApiClient(object):
             self._lark_host, MESSAGE_URI, receive_id_type
         )
         headers = {
-            "Content-Type": "application/json",
+            "Content-Type": "application/json; charset=utf-8",
             "Authorization": "Bearer " + self.tenant_access_token,
         }
-
         req_body = {
             "receive_id": receive_id,
             "content": content,
             "msg_type": msg_type,
         }
-        # print(url, headers, req_body)
+        print(url, headers, req_body)
         resp = requests.post(url=url, headers=headers, json=req_body)
         MessageApiClient._check_error_response(resp)
+        return resp
 
     def _authorize_tenant_access_token(self):
         # get tenant_access_token and set, implemented based on Feishu open api capability. doc link: https://open.feishu.cn/document/ukTMukTMukTM/ukDNz4SO0MjL5QzM/auth-v3/auth/tenant_access_token_internal
