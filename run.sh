@@ -1,1 +1,1 @@
-nohup python3 server.py > robot.log 2>&1 &
+nohup python3 KDRobot/server.py > robot.log 2>&1 &
