@@ -21,7 +21,7 @@ def save_relay_msg(msg_type, receive_id_type, receive_id, content, sender_id_typ
         "content": content,
         "sender_id_type": sender_id_type,
         "sender_id": sender_id,
-        "sender_time": TimeUtil.format_time_milsecond(create_time),
+        "sender_time": TimeUtil.parse_time_second(create_time),
         "operate_result": "",
         "msg_status": 0
     }

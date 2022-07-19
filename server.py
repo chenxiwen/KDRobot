@@ -49,7 +49,7 @@ def message_receive_event_handler(req_data: MessageReceiveEvent):
         logging.warn("Other types of messages have not been processed yet")
         return jsonify()
     if message.chat_type != "p2p":
-        logging.warn("only support p2p messages have been processed yet")
+        logging.warn("only p2p messages have been processed yet")
         return jsonify()
     # get open_id and text_content
     message_time = TimeUtil.format_time_milsecond(message.create_time)
