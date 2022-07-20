@@ -10,6 +10,13 @@ APP_SECRET = os.getenv("APP_SECRET")
 # const
 TENANT_ACCESS_TOKEN_URI = "/open-apis/auth/v3/tenant_access_token/internal"
 MESSAGE_URI = "/open-apis/im/v1/messages"
+GROUP_MEMBER_LIST = "/open-apis/im/v1/chats/{}/members"
+USER_INFO = "/open-apis/contact/v3/users/{}"
+
+proxies = {
+    "http": "http://11.8.32.43:404",
+    "https": "http://11.8.32.43:404"
+}
 
 
 class MessageApiClient(object):
@@ -68,6 +75,36 @@ class MessageApiClient(object):
         MessageApiClient._check_error_response(resp)
         print(resp.json())
         return resp.json()
+
+    def get_group_member_list(self, chat_id, page_token):
+        self._authorize_tenant_access_token()
+        url = (self._lark_host + GROUP_MEMBER_LIST).format(chat_id)
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + self.tenant_access_token,
+        }
+        params = {
+            "member_id_type": "open_id",
+            "page_token": page_token,
+            "page_size": 100
+        }
+        resp = requests.get(url=url, headers=headers, params=params)
+        MessageApiClient._check_error_response(resp)
+        return resp
+
+    def get_user_by_open_id(self, open_id):
+        self._authorize_tenant_access_token()
+        url = (self._lark_host + USER_INFO).format(open_id)
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + self.tenant_access_token,
+        }
+        params = {
+            "user_id_type": "open_id"
+        }
+        resp = requests.get(url=url, headers=headers, params=params)
+        MessageApiClient._check_error_response(resp)
+        return resp
 
     @staticmethod
     def _check_error_response(resp):

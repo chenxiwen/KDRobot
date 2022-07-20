@@ -2,6 +2,8 @@
 
 import os
 import logging
+import traceback
+
 import requests
 from event import MessageReceiveEvent, UrlVerificationEvent, EventManager, MessageReadEvent, RobotAddedEvent, \
     RobotDeletedEvent
@@ -159,13 +161,13 @@ def sendGroupMsg():
     if authHeader is None or len(authHeader) == 0 or authHeader != 'KD_ROBOT_KD':
         logging.warn("no permission to access")
         return Result(-1, "need auth").standard_format()
+    users = request.values.get("users")
     chat_id = request.values.get("chat_id")
     msg = request.values.get("msg")
     url = request.values.get("url")
     url_text = request.values.get("url_text")
     try:
-        message_api_client.send("chat_id", chat_id, "post",
-                                json.dumps(util_message2content.url2content(msg, url, url_text)))
+        message_handler.send_msg_notify_with_at(users, chat_id, msg, url, url_text)
     except Exception as e:
         logging.error(e)
         return Result(-2, e.__str__()).standard_format()
@@ -186,6 +188,17 @@ def sendEpidemicMsg2User():
     try:
         message_api_client.send("open_id", open_id, "post",
                                 json.dumps(util_message2content.url2content(msg, url, url_text)))
+    except Exception as e:
+        traceback.print_exception(e)
+        logging.error(e)
+        return Result(-2, e.__str__()).standard_format()
+    return Result(0, "success").standard_format()
+
+
+@app.route("/init/chatUsers/<chat_id>", methods=["POST"])
+def initChatUsers(chat_id):
+    try:
+        message_handler.initChatUsers(chat_id)
     except Exception as e:
         logging.error(e)
         return Result(-2, e.__str__()).standard_format()
