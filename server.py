@@ -12,6 +12,7 @@ from robot_scheduler import scheduler
 import util_message2content, message_handler
 from util_message_client import message_api_client
 import json
+from Result import Result
 
 # load env parameters form file named .env
 load_dotenv(find_dotenv())
@@ -157,14 +158,18 @@ def sendGroupMsg():
     authHeader = request.headers.get("KD_ROBOT")
     if authHeader is None or len(authHeader) == 0 or authHeader != 'KD_ROBOT_KD':
         logging.warn("no permission to access")
-        return jsonify()
+        return Result(-1, "need auth").standard_format()
     chat_id = request.values.get("chat_id")
     msg = request.values.get("msg")
     url = request.values.get("url")
     url_text = request.values.get("url_text")
-    message_api_client.send("chat_id", chat_id, "post",
-                            json.dumps(util_message2content.url2content(msg, url, url_text)))
-    return jsonify()
+    try:
+        message_api_client.send("chat_id", chat_id, "post",
+                                json.dumps(util_message2content.url2content(msg, url, url_text)))
+    except Exception as e:
+        logging.error(e)
+        return Result(-2, e.__str__()).standard_format()
+    return Result(0, "success").standard_format()
 
 
 @app.route("/message/user/notify", methods=["POST"])
@@ -173,14 +178,18 @@ def sendEpidemicMsg2User():
     authHeader = request.headers.get("KD_ROBOT")
     if authHeader is None or len(authHeader) == 0 or authHeader != 'KD_ROBOT_KD':
         logging.warn("no permission to access")
-        return jsonify()
+        return Result(-1, "need auth").standard_format()
     open_id = request.values.get("open_id")
     msg = request.values.get("msg")
     url = request.values.get("url")
     url_text = request.values.get("url_text")
-    message_api_client.send("open_id", open_id, "post",
-                            json.dumps(util_message2content.url2content(msg, url, url_text)))
-    return jsonify()
+    try:
+        message_api_client.send("open_id", open_id, "post",
+                                json.dumps(util_message2content.url2content(msg, url, url_text)))
+    except Exception as e:
+        logging.error(e)
+        return Result(-2, e.__str__()).standard_format()
+    return Result(0, "success").standard_format()
 
 
 if __name__ == "__main__":
