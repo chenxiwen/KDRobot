@@ -5,7 +5,7 @@ import logging
 import requests
 from event import MessageReceiveEvent, UrlVerificationEvent, EventManager, MessageReadEvent, RobotAddedEvent, \
     RobotDeletedEvent
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from dotenv import load_dotenv, find_dotenv
 from ender import TimeUtil
 from robot_scheduler import scheduler
@@ -150,6 +150,37 @@ def sendMsg2Chatid(chat_id, msg):
 def getGroupChatList():
     resp = message_api_client.get_group_chat_list()
     return resp
+
+
+@app.route("/message/group/notify", methods=["POST"])
+def sendGroupMsg():
+    authHeader = request.headers.get("KD_ROBOT")
+    if authHeader is None or len(authHeader) == 0 or authHeader != 'KD_ROBOT_KD':
+        logging.warn("no permission to access")
+        return jsonify()
+    chat_id = request.values.get("chat_id")
+    msg = request.values.get("msg")
+    url = request.values.get("url")
+    url_text = request.values.get("url_text")
+    message_api_client.send("chat_id", chat_id, "post",
+                            json.dumps(util_message2content.url2content(msg, url, url_text)))
+    return jsonify()
+
+
+@app.route("/message/user/notify", methods=["POST"])
+def sendEpidemicMsg2User():
+    # 测试给lt
+    authHeader = request.headers.get("KD_ROBOT")
+    if authHeader is None or len(authHeader) == 0 or authHeader != 'KD_ROBOT_KD':
+        logging.warn("no permission to access")
+        return jsonify()
+    open_id = request.values.get("open_id")
+    msg = request.values.get("msg")
+    url = request.values.get("url")
+    url_text = request.values.get("url_text")
+    message_api_client.send("open_id", open_id, "post",
+                            json.dumps(util_message2content.url2content(msg, url, url_text)))
+    return jsonify()
 
 
 if __name__ == "__main__":

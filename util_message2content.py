@@ -17,6 +17,42 @@ def fswj_url2content(txt):
     return content
 
 
+def url2content(txt, url, url_text):
+    content = {}
+    if url is None or len(url) == 0:
+        content = {
+            "zh_cn": {
+                "content": [
+                    [
+                        {
+                            "tag": "text",
+                            "text": txt,
+                        }
+                    ]
+                ]
+            }
+        }
+    else:
+        content = {
+            "zh_cn": {
+                "content": [
+                    [
+                        {
+                            "tag": "text",
+                            "text": txt,
+                        }
+                    ],
+                    [{
+                        "tag": "a",
+                        "href": url,
+                        "text": url_text
+                    }]
+                ]
+            }
+        }
+    return content
+
+
 def text2content(txt):
     content = {
         "text": txt
