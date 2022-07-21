@@ -6,6 +6,7 @@ import requests
 
 APP_ID = os.getenv("APP_ID")
 APP_SECRET = os.getenv("APP_SECRET")
+AUTH_ENV = os.getenv("AUTH_ENV")
 
 # const
 TENANT_ACCESS_TOKEN_URI = "/open-apis/auth/v3/tenant_access_token/internal"
@@ -13,10 +14,11 @@ MESSAGE_URI = "/open-apis/im/v1/messages"
 GROUP_MEMBER_LIST = "/open-apis/im/v1/chats/{}/members"
 USER_INFO = "/open-apis/contact/v3/users/{}"
 
-proxies = {
-    "http": "http://11.8.32.43:404",
-    "https": "http://11.8.32.43:404"
-}
+proxies = {}
+if AUTH_ENV != "local":
+    proxies = {
+		
+    }
 
 
 class MessageApiClient(object):
@@ -52,7 +54,7 @@ class MessageApiClient(object):
             "msg_type": msg_type,
         }
         print(url, headers, req_body)
-        resp = requests.post(url=url, headers=headers, json=req_body)
+        resp = requests.post(url=url, headers=headers, json=req_body, proxies=proxies)
         MessageApiClient._check_error_response(resp)
         return resp
 
@@ -60,7 +62,7 @@ class MessageApiClient(object):
         # get tenant_access_token and set, implemented based on Feishu open api capability. doc link: https://open.feishu.cn/document/ukTMukTMukTM/ukDNz4SO0MjL5QzM/auth-v3/auth/tenant_access_token_internal
         url = "{}{}".format(self._lark_host, TENANT_ACCESS_TOKEN_URI)
         req_body = {"app_id": self._app_id, "app_secret": self._app_secret}
-        response = requests.post(url, req_body)
+        response = requests.post(url, req_body, proxies=proxies)
         MessageApiClient._check_error_response(response)
         self._tenant_access_token = response.json().get("tenant_access_token")
 
@@ -71,7 +73,7 @@ class MessageApiClient(object):
             "Content-Type": "application/json",
             "Authorization": "Bearer " + self.tenant_access_token,
         }
-        resp = requests.get(url=url, headers=headers)
+        resp = requests.get(url=url, headers=headers, proxies=proxies)
         MessageApiClient._check_error_response(resp)
         print(resp.json())
         return resp.json()
@@ -88,7 +90,7 @@ class MessageApiClient(object):
             "page_token": page_token,
             "page_size": 100
         }
-        resp = requests.get(url=url, headers=headers, params=params)
+        resp = requests.get(url=url, headers=headers, params=params, proxies=proxies)
         MessageApiClient._check_error_response(resp)
         return resp
 
@@ -102,7 +104,7 @@ class MessageApiClient(object):
         params = {
             "user_id_type": "open_id"
         }
-        resp = requests.get(url=url, headers=headers, params=params)
+        resp = requests.get(url=url, headers=headers, params=params, proxies=proxies)
         MessageApiClient._check_error_response(resp)
         return resp
 

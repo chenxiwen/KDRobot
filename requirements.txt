@@ -4,3 +4,4 @@ requests
 pycryptodome
 flask_apscheduler
 pymongo==3.11.3
+requests

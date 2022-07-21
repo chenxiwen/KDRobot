@@ -66,9 +66,10 @@ def send_msg_notify_with_at(users, chat_id, msg, url, url_text):
     user_employees = [user["employee"] for user in user_list]
     col = mongo_db[message_col_name]
     datas = col.find({'employee': {"$in": user_employees}})
-    mongo_datas = []
-    for item in datas:
-        mongo_datas.append(item)
+    mongo_datas = [item for item in datas]
+    # mongo_datas = []
+    # for item in datas:
+    #     mongo_datas.append(item)
     for user in user_list:
         user["open_id"] = ""
         for item in mongo_datas:
@@ -123,9 +124,10 @@ def initChatUsers(chat_id):
 
         col = mongo_db[message_col_name]
         datas = col.find()
-        mongo_datas = []
-        for item in datas:
-            mongo_datas.append(item)
+        mongo_datas = [item for item in datas]
+        # mongo_datas = []
+        # for item in datas:
+        #     mongo_datas.append(item)
         for user in user_list:
             find = False
             for item in mongo_datas:
